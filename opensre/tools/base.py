@@ -106,8 +106,8 @@ class BaseTool(ABC):
             params = self.extract_params(raw)
             return self.run(params)
         except ValueError as exc:
-            # Separate ValueError (bad params) from unexpected runtime errors
-            # so callers can distinguish validation failures from tool bugs.
+            # Separate ValueError (bad params) from unexpected errors so callers
+            # can distinguish validation failures from runtime failures.
             return ToolResult(success=False, error=f"Parameter error: {exc}")
         except Exception as exc:  # noqa: BLE001
             return ToolResult(success=False, error=f"Unexpected error: {exc}")

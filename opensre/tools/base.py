@@ -100,19 +100,14 @@ class BaseTool(ABC):
         if not self.is_available():
             return ToolResult(
                 success=False,
-                error=f"Tool '{self.my_tool_name}' is not available in this environment.",
+                error=f"Tool '{self.my_tool_name}' is not available.",
             )
         try:
             params = self.extract_params(raw)
             return self.run(params)
         except ValueError as exc:
+            # Separate ValueError (bad params) from unexpected runtime errors
+            # so callers can distinguish validation failures from tool bugs.
             return ToolResult(success=False, error=f"Parameter error: {exc}")
         except Exception as exc:  # noqa: BLE001
-            return ToolResult(
-                success=False,
-                error=f"Unexpected error in '{self.my_tool_name}': {exc}",
-            )
-
-    def __repr__(self) -> str:  # pragma: no cover
-        available = "available" if self.is_available() else "unavailable"
-        return f"<{self.__class__.__name__} name={self.my_tool_name!r} {available}>"
+            return ToolResult(success=False, error=f"Unexpected error: {exc}")
